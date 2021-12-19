@@ -12,7 +12,7 @@
           <el-input
             placeholder="请输入内容"
             clearable
-            v-model="queryInfo.query"
+            v-model="queryInfo.keyword"
             @clear="getGoodsList"
           >
             <el-button
@@ -29,15 +29,15 @@
 
       <el-table :data="goodslist" stripe border style="width: 100%">
         <el-table-column type="index"> </el-table-column>
-        <el-table-column prop="goods_name" label="商品名称"></el-table-column>
+        <el-table-column prop="title" label="商品名称"></el-table-column>
         <el-table-column
-          prop="goods_price"
-          label="商品价格（元）"
+          prop="market_price"
+          label="商品原价（元）"
           width="95px"
         ></el-table-column>
         <el-table-column
-          prop="goods_weight"
-          label="商品重量"
+          prop="sell_price"
+          label="商品售价"
           width="70px"
         ></el-table-column>
         <el-table-column prop="add_time" label="创建时间" width="170px">
@@ -56,7 +56,7 @@
               size="mini"
               type="warning"
               icon="el-icon-delete"
-              @click="removeById(scope.row.goods_id)"
+              @click="removeById(scope.row.id)"
             ></el-button>
           </template>
         </el-table-column>
@@ -65,9 +65,9 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
+        :current-page="queryInfo.pageIndex"
         :page-sizes="[10, 20, 50]"
-        :page-size="queryInfo.pagesize"
+        :page-size="queryInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
         background
@@ -82,9 +82,9 @@ export default {
   data() {
     return {
       queryInfo: {
-        query: "",
-        pagenum: 1,
-        pagesize: 10
+        keyword: "",
+        pageIndex: 1,
+        pageSize: 10
       },
       goodslist: [],
       total: 0
@@ -92,21 +92,23 @@ export default {
   },
   methods: {
     async getGoodsList() {
-      const { data } = await this.$http.get("goods", {
+      const { data } = await this.$http.get("goods/list", {
         params: this.queryInfo
       });
-      if (data.meta.status !== 200) {
+
+      if (data.status !== 0) {
         return this.$message.error(data.meta.msg);
       }
-      this.goodslist = data.data.goods;
-      this.total = data.data.total;
+      console.log(data)
+      this.goodslist = data.message;
+      this.total = data.total;
     },
     handleSizeChange(newSize) {
-      this.queryInfo.pagesize = newSize;
+      this.queryInfo.pageSize = newSize;
       this.getGoodsList();
     },
     handleCurrentChange(newPage) {
-      this.queryInfo.pagenum = newPage;
+      this.queryInfo.pageIndex = newPage;
       this.getGoodsList();
     },
     removeById(id) {
@@ -117,8 +119,8 @@ export default {
       })
         .then(async () => {
           const { data } = await this.$http.delete(`goods/${id}`);
-          if (data.meta.status !== 200) {
-            return this.$message.error(data.meta.msg);
+          if (data.status !== 0) {
+            return this.$message.error(data.message);
           }
           this.getGoodsList();
           this.$message({

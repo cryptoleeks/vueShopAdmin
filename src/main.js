@@ -13,8 +13,8 @@ import 'quill/dist/quill.bubble.css'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
-
+axios.defaults.baseURL = 'http://loveyx815.cn:8020/api/'
+// axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
 // 请求头拦截
 axios.interceptors.request.use(config => {
     NProgress.start()
